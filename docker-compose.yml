@@ -1,0 +1,7 @@
+services:
+  web:
+    image: php:8.2-apache
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: test

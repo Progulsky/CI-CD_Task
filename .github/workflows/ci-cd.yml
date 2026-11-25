@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Composer dependencies
+        if: hashFiles('composer.json') != ''
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Check PHP syntax
+        run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} +
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config -q
+
+  cd:
+    name: CD
+    needs: ci
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mock Deploy
+        run: echo "SSH connection and docker compose up simulated"
